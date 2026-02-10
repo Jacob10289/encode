@@ -12,10 +12,6 @@ Một công cụ mã hóa/giải mã file chuyên nghiệp sử dụng thuật t
 - **🎨 Giao diện đẹp** - Thiết kế gradient hiện đại với hiệu ứng ánh sáng
 - **⚡ Dễ sử dụng** - Kéo thả file, giao diện trực quan
 
-## 🚀 Demo
-
-Truy cập: [https://gpse2s4guz7es.ok.kimi.link](https://gpse2s4guz7es.ok.kimi.link)
-
 ## 📋 Cách Sử Dụng
 
 ### Mã Hóa File
