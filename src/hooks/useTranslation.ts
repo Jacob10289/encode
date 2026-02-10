@@ -485,13 +485,21 @@ const translations: Record<string, Record<string, string>> = {
   },
 };
 
+} as const;
+
+type Lang = keyof typeof translations;
+
+function isLang(value: string): value is Lang {
+  return value in translations;
+}
+
 export function useTranslation() {
-  const [language, setLanguage] = useState<'vi' | 'en' | 'zh' | 'ja' | 'ko'>('vi');
+  const [language, setLanguage] = useState<Lang>('vi');
 
   useEffect(() => {
     const saved = localStorage.getItem('app-language');
-    if (saved && saved in translations) {
-      setLanguage(saved as keyof typeof translations);
+    if (saved && isLang(saved)) {
+      setLanguage(saved);
     }
   }, []);
 
@@ -505,11 +513,8 @@ export function useTranslation() {
   const i18n = {
     language,
     changeLanguage: (lng: string) => {
-      if (!(lng in translations)) return;
-      setLanguage(lng as keyof typeof translations);
+      if (!isLang(lng)) return;
+      setLanguage(lng);
       localStorage.setItem('app-language', lng);
     },
   };
-
-  return { t, i18n };
-}
