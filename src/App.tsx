@@ -63,20 +63,17 @@ function App() {
         <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* Hero Section */}
-        <section className="pt-32 md:pt-40 pb-12 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6 animate-fade-in">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-white/60 text-sm">{t('footer.security')}</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 animate-slide-up">
-              <span className="gradient-text">{t('app.title')}</span>
-            </h1>
-            <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto animate-slide-up animation-delay-100">
-              {t('app.description')}
-            </p>
-          </div>
-        </section>
+<section className="pt-32 md:pt-40 pb-12 px-4 sm:px-6 lg:px-8">
+  <div className="max-w-7xl mx-auto text-center">
+    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 animate-slide-up">
+      <span className="gradient-text">{t('app.title')}</span>
+    </h1>
+
+    <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto animate-slide-up animation-delay-100">
+      {t('app.description')}
+    </p>
+  </div>
+</section>
 
         {/* Main Section */}
         <main className="py-12 px-4 sm:px-6 lg:px-8">
