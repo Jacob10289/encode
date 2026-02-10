@@ -1,5 +1,5 @@
 import { useTranslation } from '../hooks/useTranslation';
-import { Shield, Lock, Mail, ExternalLink } from 'lucide-react';
+import { Lock, Mail, ExternalLink } from 'lucide-react';
 
 export default function Footer() {
   const { t } = useTranslation();
