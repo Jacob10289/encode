@@ -27,28 +27,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Security Info */}
-          <div>
-            <h4 className="text-white font-medium mb-4 flex items-center gap-2">
-              <Shield className="w-4 h-4 text-purple-400" />
-              {t('footer.security')}
-            </h4>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2 text-white/50 text-sm">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                {t('footer.privacy')}
-              </li>
-              <li className="flex items-center gap-2 text-white/50 text-sm">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                AES-256-GCM Encryption
-              </li>
-              <li className="flex items-center gap-2 text-white/50 text-sm">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                PBKDF2 Key Derivation
-              </li>
-            </ul>
-          </div>
-
           {/* Contact */}
           <div>
             <h4 className="text-white font-medium mb-4 flex items-center gap-2">
@@ -56,10 +34,10 @@ export default function Footer() {
               {t('footer.contact')}
             </h4>
             <a
-              href="mailto:contact@phamduong.com"
+              href="mailto:dp810241@gmail.com"
               className="flex items-center gap-2 text-white/50 hover:text-white text-sm transition-colors"
             >
-              contact@phamduong.com
+              dp810241@gmail.com
               <ExternalLink className="w-3 h-3" />
             </a>
           </div>
