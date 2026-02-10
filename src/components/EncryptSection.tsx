@@ -18,13 +18,13 @@ interface TextEncryptionResultDisplay {
 export default function EncryptSection() {
   const { t } = useTranslation();
   const [mode, setMode] = useState<EncryptMode>('file');
-  
+
   // File encryption state
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  
+
   // Text encryption state
   const [plaintext, setPlaintext] = useState('');
-  
+
   // Common state
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -43,6 +43,7 @@ export default function EncryptSection() {
       return;
     }
 
+    // Keep this check explicit (fast UX) even though validatePassword also checks length
     if (password.length < 8) {
       setError(t('errors.passwordTooShort'));
       return;
@@ -170,7 +171,7 @@ export default function EncryptSection() {
               className="text-area-glow w-full h-40"
             />
             <p className="mt-2 text-white/40 text-xs text-right">
-              {plaintext.length} characters
+              {plaintext.length} {t('textencrypt.characters')}
             </p>
           </div>
         )}
@@ -204,6 +205,7 @@ export default function EncryptSection() {
                   )}
                 </button>
               </div>
+
               {password && (
                 <p
                   className={`mt-2 text-sm ${
@@ -214,9 +216,11 @@ export default function EncryptSection() {
                       : 'text-orange-400'
                   }`}
                 >
-                  {passwordValidation.message}
+                  {/* IMPORTANT: validatePassword now returns messageKey */}
+                  {t(passwordValidation.messageKey)}
                 </p>
               )}
+
               <p className="mt-2 text-white/40 text-xs">{t('encrypt.password.hint')}</p>
             </div>
 
@@ -246,11 +250,12 @@ export default function EncryptSection() {
                   )}
                 </button>
               </div>
+
               {confirmPassword && !passwordsMatch && (
                 <p className="mt-2 text-red-400 text-sm">{t('errors.passwordMismatch')}</p>
               )}
               {confirmPassword && passwordsMatch && (
-                <p className="mt-2 text-green-400 text-sm">Mật khẩu khớp</p>
+                <p className="mt-2 text-green-400 text-sm">{t('password.match')}</p>
               )}
             </div>
           </div>
@@ -266,7 +271,11 @@ export default function EncryptSection() {
         {/* Encrypt Button */}
         <button
           onClick={handleEncrypt}
-          disabled={isEncrypting || !passwordsMatch || (mode === 'file' ? !selectedFile : !plaintext.trim())}
+          disabled={
+            isEncrypting ||
+            !passwordsMatch ||
+            (mode === 'file' ? !selectedFile : !plaintext.trim())
+          }
           className="btn-gradient w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
         >
           {isEncrypting ? (
