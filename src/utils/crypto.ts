@@ -351,17 +351,18 @@ export function formatFileSize(bytes: number): string {
 
 /**
  * Validate password strength
+ * NOTE: Returns messageKey for i18n instead of hardcoded English text.
  */
 export function validatePassword(password: string): {
   valid: boolean;
   strength: 'weak' | 'medium' | 'strong';
-  message: string;
+  messageKey: string;
 } {
   if (password.length < 8) {
     return {
       valid: false,
       strength: 'weak',
-      message: 'Password must be at least 8 characters',
+      messageKey: 'errors.passwordTooShort', // already exists in your translations
     };
   }
 
@@ -376,19 +377,19 @@ export function validatePassword(password: string): {
     return {
       valid: true,
       strength: 'strong',
-      message: 'Strong password',
+      messageKey: 'password.strength.strong',
     };
   } else if (password.length >= 8 && score >= 2) {
     return {
       valid: true,
       strength: 'medium',
-      message: 'Medium strength password',
+      messageKey: 'password.strength.medium',
     };
   } else {
     return {
       valid: true,
       strength: 'weak',
-      message: 'Weak password - consider using more character types',
+      messageKey: 'password.strength.weak',
     };
   }
 }
@@ -400,11 +401,11 @@ export function generateSecurePassword(length: number = 16): string {
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
   const array = new Uint8Array(length);
   crypto.getRandomValues(array);
-  
+
   let password = '';
   for (let i = 0; i < length; i++) {
     password += charset[array[i] % charset.length];
   }
-  
+
   return password;
 }
