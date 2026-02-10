@@ -78,16 +78,5 @@ export default function AboutSection() {
           ))}
         </div>
       </div>
-
-      {/* Security Badge */}
-      <div className="mt-8 text-center">
-        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/5 border border-white/10">
-          <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-white/60 text-sm">{t('footer.privacy')}</span>
-          <span className="text-white/30">|</span>
-          <span className="text-white/60 text-sm">{t('footer.security')}</span>
-        </div>
-      </div>
-    </div>
   );
 }
