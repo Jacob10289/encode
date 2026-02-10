@@ -1,29 +1,35 @@
 import { useState, useCallback, useEffect } from 'react';
 
-// Translations
-const translations: Record<string, Record<string, string>> = {
+const translations = {
   vi: {
     'app.title': 'Công Cụ Mã Hóa AES256GCM',
     'app.subtitle': 'Bảo vệ dữ liệu của bạn với mã hóa cấp quân sự',
     'app.description': 'Mã hóa và giải mã file an toàn với thuật toán AES-256-GCM',
+
     'nav.encrypt': 'Mã Hóa',
     'nav.decrypt': 'Giải Mã',
     'nav.about': 'Giới Thiệu',
+
     'encrypt.title': 'Mã Hóa File',
     'encrypt.subtitle': 'Tải lên file để mã hóa bảo mật',
     'encrypt.dropzone.title': 'Kéo thả file vào đây',
     'encrypt.dropzone.or': 'hoặc',
     'encrypt.dropzone.browse': 'Chọn file từ máy tính',
     'encrypt.dropzone.maxSize': 'Kích thước tối đa: 100MB',
+
     'encrypt.password.label': 'Mật khẩu mã hóa',
     'encrypt.password.placeholder': 'Nhập mật khẩu mạnh...',
-    'encrypt.password.hint': 'Sử dụng mật khẩu ít nhất 12 ký tự với chữ hoa, chữ thường, số và ký tự đặc biệt',
+    'encrypt.password.hint':
+      'Sử dụng mật khẩu ít nhất 12 ký tự với chữ hoa, chữ thường, số và ký tự đặc biệt',
+
     'encrypt.confirmPassword.label': 'Xác nhận mật khẩu',
     'encrypt.confirmPassword.placeholder': 'Nhập lại mật khẩu...',
+
     'encrypt.button': 'Mã Hóa File',
     'encrypt.processing': 'Đang mã hóa...',
     'encrypt.success': 'Mã hóa thành công!',
     'encrypt.error': 'Mã hóa thất bại',
+
     'decrypt.title': 'Giải Mã File',
     'decrypt.subtitle': 'Nhập token và mật khẩu để giải mã',
     'decrypt.token.label': 'Token mã hóa',
@@ -34,6 +40,7 @@ const translations: Record<string, Record<string, string>> = {
     'decrypt.processing': 'Đang giải mã...',
     'decrypt.success': 'Giải mã thành công!',
     'decrypt.error': 'Giải mã thất bại - Kiểm tra token và mật khẩu',
+
     'result.title': 'Kết Quả Mã Hóa',
     'result.token': 'Token Bảo Mật',
     'result.filename': 'Tên file',
@@ -42,18 +49,21 @@ const translations: Record<string, Record<string, string>> = {
     'result.download': 'Tải xuống',
     'result.copied': 'Đã sao chép!',
     'result.warning': 'Lưu ý: Token này chỉ hiển thị một lần. Hãy sao chép và lưu trữ an toàn!',
+
     'language.title': 'Ngôn ngữ',
     'language.vi': 'Tiếng Việt',
     'language.en': 'English',
     'language.zh': '中文',
     'language.ja': '日本語',
     'language.ko': '한국어',
+
     'footer.copyright': 'Bảo lưu mọi quyền.',
     'footer.tagline': 'Bảo mật dữ liệu là ưu tiên hàng đầu',
     'footer.security': 'Mã hóa AES-256-GCM',
     'footer.privacy': 'Dữ liệu được xử lý cục bộ',
     'footer.terms': 'Điều khoản sử dụng',
     'footer.contact': 'Liên hệ',
+
     'errors.fileTooLarge': 'File quá lớn. Kích thước tối đa là 100MB.',
     'errors.passwordMismatch': 'Mật khẩu không khớp',
     'errors.passwordTooShort': 'Mật khẩu phải có ít nhất 8 ký tự',
@@ -61,6 +71,7 @@ const translations: Record<string, Record<string, string>> = {
     'errors.missingFields': 'Vui lòng điền đầy đủ thông tin',
     'errors.decryptionFailed': 'Giải mã thất bại. Kiểm tra lại mật khẩu.',
     'errors.noFile': 'Vui lòng chọn file để mã hóa',
+
     'about.title': 'Giới Thiệu',
     'about.description':
       'Công cụ mã hóa AES256GCM cung cấp giải pháp bảo mật dữ liệu đơn giản và hiệu quả. Tất cả dữ liệu được xử lý cục bộ trong trình duyệt, đảm bảo quyền riêng tư tuyệt đối.',
@@ -75,8 +86,10 @@ const translations: Record<string, Record<string, string>> = {
     'about.howItWorks.step2': 'Nhập mật khẩu mạnh',
     'about.howItWorks.step3': 'Nhận token bảo mật',
     'about.howItWorks.step4': 'Sử dụng token và mật khẩu để giải mã',
+
     'encrypt.tab.file': 'Mã hóa File',
     'encrypt.tab.text': 'Mã hóa Văn bản',
+
     'textencrypt.title': 'Mã Hóa Văn Bản',
     'textencrypt.subtitle': 'Nhập nội dung văn bản để mã hóa bảo mật',
     'textencrypt.label': 'Nội dung văn bản',
@@ -84,13 +97,17 @@ const translations: Record<string, Record<string, string>> = {
     'textencrypt.button': 'Mã Hóa Văn Bản',
     'textencrypt.processing': 'Đang mã hóa...',
     'textencrypt.success': 'Mã hóa thành công!',
+
+    // ✅ (BỔ SUNG) để EncryptSection không bị fallback key
+    'textencrypt.error': 'Mã hóa văn bản thất bại',
+
     'textdecrypt.title': 'Giải Mã Văn Bản',
     'textdecrypt.subtitle': 'Nhập token và mật khẩu để giải mã văn bản',
     'textdecrypt.result.label': 'Nội dung đã giải mã',
     'textdecrypt.result.placeholder': 'Nội dung giải mã sẽ hiển thị ở đây...',
     'textdecrypt.copy': 'Sao chép nội dung',
 
-    // ✅ Added for EncryptSection + validatePassword i18n
+    // ✅ Added for EncryptSection + password strength i18n
     'password.match': 'Mật khẩu khớp',
     'textencrypt.characters': 'ký tự',
     'password.strength.strong': 'Mật khẩu mạnh',
@@ -102,25 +119,31 @@ const translations: Record<string, Record<string, string>> = {
     'app.title': 'AES256GCM Encryption Tool',
     'app.subtitle': 'Protect your data with military-grade encryption',
     'app.description': 'Securely encrypt and decrypt files using AES-256-GCM algorithm',
+
     'nav.encrypt': 'Encrypt',
     'nav.decrypt': 'Decrypt',
     'nav.about': 'About',
+
     'encrypt.title': 'Encrypt File',
     'encrypt.subtitle': 'Upload a file to encrypt securely',
     'encrypt.dropzone.title': 'Drag and drop file here',
     'encrypt.dropzone.or': 'or',
     'encrypt.dropzone.browse': 'Browse from computer',
     'encrypt.dropzone.maxSize': 'Maximum size: 100MB',
+
     'encrypt.password.label': 'Encryption Password',
     'encrypt.password.placeholder': 'Enter a strong password...',
     'encrypt.password.hint':
       'Use at least 12 characters with uppercase, lowercase, numbers and special characters',
+
     'encrypt.confirmPassword.label': 'Confirm Password',
     'encrypt.confirmPassword.placeholder': 'Re-enter password...',
+
     'encrypt.button': 'Encrypt File',
     'encrypt.processing': 'Encrypting...',
     'encrypt.success': 'Encryption successful!',
     'encrypt.error': 'Encryption failed',
+
     'decrypt.title': 'Decrypt File',
     'decrypt.subtitle': 'Enter token and password to decrypt',
     'decrypt.token.label': 'Encryption Token',
@@ -131,6 +154,7 @@ const translations: Record<string, Record<string, string>> = {
     'decrypt.processing': 'Decrypting...',
     'decrypt.success': 'Decryption successful!',
     'decrypt.error': 'Decryption failed - Check token and password',
+
     'result.title': 'Encryption Result',
     'result.token': 'Secure Token',
     'result.filename': 'Filename',
@@ -138,20 +162,22 @@ const translations: Record<string, Record<string, string>> = {
     'result.copy': 'Copy',
     'result.download': 'Download',
     'result.copied': 'Copied!',
-    'result.warning':
-      'Warning: This token is displayed only once. Please copy and store it safely!',
+    'result.warning': 'Warning: This token is displayed only once. Please copy and store it safely!',
+
     'language.title': 'Language',
     'language.vi': 'Tiếng Việt',
     'language.en': 'English',
     'language.zh': '中文',
     'language.ja': '日本語',
     'language.ko': '한국어',
+
     'footer.copyright': 'All rights reserved.',
     'footer.tagline': 'Data security is our top priority',
     'footer.security': 'AES-256-GCM Encryption',
     'footer.privacy': 'Local data processing',
     'footer.terms': 'Terms of Use',
     'footer.contact': 'Contact',
+
     'errors.fileTooLarge': 'File too large. Maximum size is 100MB.',
     'errors.passwordMismatch': 'Passwords do not match',
     'errors.passwordTooShort': 'Password must be at least 8 characters',
@@ -159,6 +185,7 @@ const translations: Record<string, Record<string, string>> = {
     'errors.missingFields': 'Please fill in all fields',
     'errors.decryptionFailed': 'Decryption failed. Please check your password.',
     'errors.noFile': 'Please select a file to encrypt',
+
     'about.title': 'About',
     'about.description':
       'The AES256GCM Encryption Tool provides a simple and effective data security solution. All data is processed locally in the browser, ensuring absolute privacy.',
@@ -173,8 +200,10 @@ const translations: Record<string, Record<string, string>> = {
     'about.howItWorks.step2': 'Enter strong password',
     'about.howItWorks.step3': 'Receive secure token',
     'about.howItWorks.step4': 'Use token and password to decrypt',
+
     'encrypt.tab.file': 'Encrypt File',
     'encrypt.tab.text': 'Encrypt Text',
+
     'textencrypt.title': 'Encrypt Text',
     'textencrypt.subtitle': 'Enter text content to encrypt securely',
     'textencrypt.label': 'Text content',
@@ -182,13 +211,17 @@ const translations: Record<string, Record<string, string>> = {
     'textencrypt.button': 'Encrypt Text',
     'textencrypt.processing': 'Encrypting...',
     'textencrypt.success': 'Encryption successful!',
+
+    // ✅ (BỔ SUNG)
+    'textencrypt.error': 'Text encryption failed',
+
     'textdecrypt.title': 'Decrypt Text',
     'textdecrypt.subtitle': 'Enter token and password to decrypt text',
     'textdecrypt.result.label': 'Decrypted content',
     'textdecrypt.result.placeholder': 'Decrypted content will appear here...',
     'textdecrypt.copy': 'Copy content',
 
-    // ✅ Added for EncryptSection + validatePassword i18n
+    // ✅ Added
     'password.match': 'Passwords match',
     'textencrypt.characters': 'characters',
     'password.strength.strong': 'Strong password',
@@ -200,24 +233,30 @@ const translations: Record<string, Record<string, string>> = {
     'app.title': 'AES256GCM加密工具',
     'app.subtitle': '使用军用级加密保护您的数据',
     'app.description': '使用AES-256-GCM算法安全地加密和解密文件',
+
     'nav.encrypt': '加密',
     'nav.decrypt': '解密',
     'nav.about': '关于',
+
     'encrypt.title': '加密文件',
     'encrypt.subtitle': '上传文件进行安全加密',
     'encrypt.dropzone.title': '将文件拖放到此处',
     'encrypt.dropzone.or': '或',
     'encrypt.dropzone.browse': '从电脑浏览',
     'encrypt.dropzone.maxSize': '最大大小：100MB',
+
     'encrypt.password.label': '加密密码',
     'encrypt.password.placeholder': '输入强密码...',
     'encrypt.password.hint': '使用至少12个字符，包含大小写字母、数字和特殊字符',
+
     'encrypt.confirmPassword.label': '确认密码',
     'encrypt.confirmPassword.placeholder': '重新输入密码...',
+
     'encrypt.button': '加密文件',
     'encrypt.processing': '正在加密...',
     'encrypt.success': '加密成功！',
     'encrypt.error': '加密失败',
+
     'decrypt.title': '解密文件',
     'decrypt.subtitle': '输入令牌和密码进行解密',
     'decrypt.token.label': '加密令牌',
@@ -228,6 +267,7 @@ const translations: Record<string, Record<string, string>> = {
     'decrypt.processing': '正在解密...',
     'decrypt.success': '解密成功！',
     'decrypt.error': '解密失败 - 请检查令牌和密码',
+
     'result.title': '加密结果',
     'result.token': '安全令牌',
     'result.filename': '文件名',
@@ -236,18 +276,21 @@ const translations: Record<string, Record<string, string>> = {
     'result.download': '下载',
     'result.copied': '已复制！',
     'result.warning': '警告：此令牌仅显示一次。请复制并安全保存！',
+
     'language.title': '语言',
     'language.vi': 'Tiếng Việt',
     'language.en': 'English',
     'language.zh': '中文',
     'language.ja': '日本語',
     'language.ko': '한국어',
+
     'footer.copyright': '保留所有权利。',
     'footer.tagline': '数据安全是我们的首要任务',
     'footer.security': 'AES-256-GCM加密',
     'footer.privacy': '本地数据处理',
     'footer.terms': '使用条款',
     'footer.contact': '联系我们',
+
     'errors.fileTooLarge': '文件太大。最大大小为100MB。',
     'errors.passwordMismatch': '密码不匹配',
     'errors.passwordTooShort': '密码必须至少为8个字符',
@@ -255,6 +298,7 @@ const translations: Record<string, Record<string, string>> = {
     'errors.missingFields': '请填写所有字段',
     'errors.decryptionFailed': '解密失败。请检查您的密码。',
     'errors.noFile': '请选择要加密的文件',
+
     'about.title': '关于',
     'about.description':
       'AES256GCM加密工具提供简单有效的数据安全解决方案。所有数据都在浏览器中本地处理，确保绝对隐私。',
@@ -269,8 +313,10 @@ const translations: Record<string, Record<string, string>> = {
     'about.howItWorks.step2': '输入强密码',
     'about.howItWorks.step3': '接收安全令牌',
     'about.howItWorks.step4': '使用令牌和密码解密',
+
     'encrypt.tab.file': '加密文件',
     'encrypt.tab.text': '加密文本',
+
     'textencrypt.title': '加密文本',
     'textencrypt.subtitle': '输入文本内容进行安全加密',
     'textencrypt.label': '文本内容',
@@ -278,6 +324,10 @@ const translations: Record<string, Record<string, string>> = {
     'textencrypt.button': '加密文本',
     'textencrypt.processing': '正在加密...',
     'textencrypt.success': '加密成功！',
+
+    // ✅ (BỔ SUNG)
+    'textencrypt.error': '文本加密失败',
+
     'textdecrypt.title': '解密文本',
     'textdecrypt.subtitle': '输入令牌和密码解密文本',
     'textdecrypt.result.label': '解密后的内容',
@@ -296,24 +346,30 @@ const translations: Record<string, Record<string, string>> = {
     'app.title': 'AES256GCM暗号化ツール',
     'app.subtitle': '軍事レベルの暗号化でデータを保護',
     'app.description': 'AES-256-GCMアルゴリズムを使用してファイルを安全に暗号化・復号化',
+
     'nav.encrypt': '暗号化',
     'nav.decrypt': '復号化',
     'nav.about': '概要',
+
     'encrypt.title': 'ファイルを暗号化',
     'encrypt.subtitle': 'ファイルをアップロードして安全に暗号化',
     'encrypt.dropzone.title': 'ここにファイルをドラッグ＆ドロップ',
     'encrypt.dropzone.or': 'または',
     'encrypt.dropzone.browse': 'コンピュータから参照',
     'encrypt.dropzone.maxSize': '最大サイズ：100MB',
+
     'encrypt.password.label': '暗号化パスワード',
     'encrypt.password.placeholder': '強力なパスワードを入力...',
     'encrypt.password.hint': '大文字、小文字、数字、特殊文字を含む12文字以上を使用してください',
+
     'encrypt.confirmPassword.label': 'パスワードを確認',
     'encrypt.confirmPassword.placeholder': 'パスワードを再入力...',
+
     'encrypt.button': 'ファイルを暗号化',
     'encrypt.processing': '暗号化中...',
     'encrypt.success': '暗号化成功！',
     'encrypt.error': '暗号化に失敗しました',
+
     'decrypt.title': 'ファイルを復号化',
     'decrypt.subtitle': 'トークンとパスワードを入力して復号化',
     'decrypt.token.label': '暗号化トークン',
@@ -324,6 +380,7 @@ const translations: Record<string, Record<string, string>> = {
     'decrypt.processing': '復号化中...',
     'decrypt.success': '復号化成功！',
     'decrypt.error': '復号化に失敗しました - トークンとパスワードを確認してください',
+
     'result.title': '暗号化結果',
     'result.token': 'セキュアトークン',
     'result.filename': 'ファイル名',
@@ -332,18 +389,21 @@ const translations: Record<string, Record<string, string>> = {
     'result.download': 'ダウンロード',
     'result.copied': 'コピーしました！',
     'result.warning': '警告：このトークンは一度だけ表示されます。コピーして安全に保管してください！',
+
     'language.title': '言語',
     'language.vi': 'Tiếng Việt',
     'language.en': 'English',
     'language.zh': '中文',
     'language.ja': '日本語',
     'language.ko': '한국어',
+
     'footer.copyright': '全著作権所有。',
     'footer.tagline': 'データセキュリティが最優先事項',
     'footer.security': 'AES-256-GCM暗号化',
     'footer.privacy': 'ローカルデータ処理',
     'footer.terms': '利用規約',
     'footer.contact': 'お問い合わせ',
+
     'errors.fileTooLarge': 'ファイルが大きすぎます。最大サイズは100MBです。',
     'errors.passwordMismatch': 'パスワードが一致しません',
     'errors.passwordTooShort': 'パスワードは8文字以上である必要があります',
@@ -351,6 +411,7 @@ const translations: Record<string, Record<string, string>> = {
     'errors.missingFields': 'すべてのフィールドに入力してください',
     'errors.decryptionFailed': '復号化に失敗しました。パスワードを確認してください。',
     'errors.noFile': '暗号化するファイルを選択してください',
+
     'about.title': '概要',
     'about.description':
       'AES256GCM暗号化ツールは、シンプルで効果的なデータセキュリティソリューションを提供します。すべてのデータはブラウザでローカルに処理され、絶対的なプライバシーを確保します。',
@@ -365,8 +426,10 @@ const translations: Record<string, Record<string, string>> = {
     'about.howItWorks.step2': '強力なパスワードを入力',
     'about.howItWorks.step3': 'セキュアトークンを受信',
     'about.howItWorks.step4': 'トークンとパスワードを使用して復号化',
+
     'encrypt.tab.file': 'ファイルを暗号化',
     'encrypt.tab.text': 'テキストを暗号化',
+
     'textencrypt.title': 'テキストを暗号化',
     'textencrypt.subtitle': 'テキストを入力して安全に暗号化',
     'textencrypt.label': 'テキスト内容',
@@ -374,6 +437,10 @@ const translations: Record<string, Record<string, string>> = {
     'textencrypt.button': 'テキストを暗号化',
     'textencrypt.processing': '暗号化中...',
     'textencrypt.success': '暗号化成功！',
+
+    // ✅ (BỔ SUNG)
+    'textencrypt.error': 'テキストの暗号化に失敗しました',
+
     'textdecrypt.title': 'テキストを復号化',
     'textdecrypt.subtitle': 'トークンとパスワードを入力してテキストを復号化',
     'textdecrypt.result.label': '復号化された内容',
@@ -392,24 +459,30 @@ const translations: Record<string, Record<string, string>> = {
     'app.title': 'AES256GCM 암호화 도구',
     'app.subtitle': '군사급 암호화로 데이터 보호',
     'app.description': 'AES-256-GCM 알고리즘을 사용하여 파일을 안전하게 암호화 및 복호화',
+
     'nav.encrypt': '암호화',
     'nav.decrypt': '복호화',
     'nav.about': '소개',
+
     'encrypt.title': '파일 암호화',
     'encrypt.subtitle': '파일을 업로드하여 안전하게 암호화',
     'encrypt.dropzone.title': '여기에 파일을 끌어다 놓기',
     'encrypt.dropzone.or': '또는',
     'encrypt.dropzone.browse': '컴퓨터에서 찾기',
     'encrypt.dropzone.maxSize': '최대 크기: 100MB',
+
     'encrypt.password.label': '암호화 비밀번호',
     'encrypt.password.placeholder': '강력한 비밀번호 입력...',
     'encrypt.password.hint': '대문자, 소문자, 숫자 및 특수 문자를 포함하여 12자 이상 사용',
+
     'encrypt.confirmPassword.label': '비밀번호 확인',
     'encrypt.confirmPassword.placeholder': '비밀번호 다시 입력...',
+
     'encrypt.button': '파일 암호화',
     'encrypt.processing': '암호화 중...',
     'encrypt.success': '암호화 성공!',
     'encrypt.error': '암호화 실패',
+
     'decrypt.title': '파일 복호화',
     'decrypt.subtitle': '토큰과 비밀번호를 입력하여 복호화',
     'decrypt.token.label': '암호화 토큰',
@@ -420,6 +493,7 @@ const translations: Record<string, Record<string, string>> = {
     'decrypt.processing': '복호화 중...',
     'decrypt.success': '복호화 성공!',
     'decrypt.error': '복호화 실패 - 토큰과 비밀번호 확인',
+
     'result.title': '암호화 결과',
     'result.token': '보안 토큰',
     'result.filename': '파일 이름',
@@ -428,18 +502,21 @@ const translations: Record<string, Record<string, string>> = {
     'result.download': '다운로드',
     'result.copied': '복사됨!',
     'result.warning': '경고: 이 토큰은 한 번만 표시됩니다. 복사하여 안전하게 보관하세요!',
+
     'language.title': '언어',
     'language.vi': 'Tiếng Việt',
     'language.en': 'English',
     'language.zh': '中文',
     'language.ja': '日本語',
     'language.ko': '한국어',
+
     'footer.copyright': '모든 권리 보유.',
     'footer.tagline': '데이터 보안이 최우선 과제',
     'footer.security': 'AES-256-GCM 암호화',
     'footer.privacy': '로컬 데이터 처리',
     'footer.terms': '이용 약관',
     'footer.contact': '문의하기',
+
     'errors.fileTooLarge': '파일이 너무 큽니다. 최대 크기는 100MB입니다.',
     'errors.passwordMismatch': '비밀번호가 일치하지 않습니다',
     'errors.passwordTooShort': '비밀번호는 최소 8자 이상이어야 합니다',
@@ -447,6 +524,7 @@ const translations: Record<string, Record<string, string>> = {
     'errors.missingFields': '모든 필드를 입력해 주세요',
     'errors.decryptionFailed': '복호화에 실패했습니다. 비밀번호를 확인해 주세요.',
     'errors.noFile': '암호화할 파일을 선택해 주세요',
+
     'about.title': '소개',
     'about.description':
       'AES256GCM 암호화 도구는 간단하고 효과적인 데이터 보안 솔루션을 제공합니다. 모든 데이터는 브라우저에서 로컬로 처리되어 절대적인 개인정보 보호를 보장합니다.',
@@ -461,8 +539,10 @@ const translations: Record<string, Record<string, string>> = {
     'about.howItWorks.step2': '강력한 비밀번호 입력',
     'about.howItWorks.step3': '보안 토큰 수신',
     'about.howItWorks.step4': '토큰과 비밀번호를 사용하여 복호화',
+
     'encrypt.tab.file': '파일 암호화',
     'encrypt.tab.text': '텍스트 암호화',
+
     'textencrypt.title': '텍스트 암호화',
     'textencrypt.subtitle': '텍스트를 입력하여 안전하게 암호화',
     'textencrypt.label': '텍스트 내용',
@@ -470,6 +550,10 @@ const translations: Record<string, Record<string, string>> = {
     'textencrypt.button': '텍스트 암호화',
     'textencrypt.processing': '암호화 중...',
     'textencrypt.success': '암호화 성공!',
+
+    // ✅ (BỔ SUNG)
+    'textencrypt.error': '텍스트 암호화 실패',
+
     'textdecrypt.title': '텍스트 복호화',
     'textdecrypt.subtitle': '토큰과 비밀번호를 입력하여 텍스트 복호화',
     'textdecrypt.result.label': '복호화된 내용',
@@ -483,8 +567,6 @@ const translations: Record<string, Record<string, string>> = {
     'password.strength.medium': '중간 강도의 비밀번호',
     'password.strength.weak': '약한 비밀번호 - 더 다양한 문자 조합을 권장합니다',
   },
-};
-
 } as const;
 
 type Lang = keyof typeof translations;
@@ -498,14 +580,14 @@ export function useTranslation() {
 
   useEffect(() => {
     const saved = localStorage.getItem('app-language');
-    if (saved && isLang(saved)) {
-      setLanguage(saved);
-    }
+    if (saved && isLang(saved)) setLanguage(saved);
   }, []);
 
   const t = useCallback(
     (key: string): string => {
-      return translations[language]?.[key] ?? translations.vi[key] ?? key;
+      return (translations[language] as Record<string, string>)[key]
+        ?? (translations.vi as Record<string, string>)[key]
+        ?? key;
     },
     [language]
   );
@@ -518,3 +600,6 @@ export function useTranslation() {
       localStorage.setItem('app-language', lng);
     },
   };
+
+  return { t, i18n };
+}
