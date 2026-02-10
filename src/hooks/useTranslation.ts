@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
-// Vietnamese translations (default)
+// Translations
 const translations: Record<string, Record<string, string>> = {
   vi: {
     'app.title': 'Công Cụ Mã Hóa AES256GCM',
@@ -62,7 +62,8 @@ const translations: Record<string, Record<string, string>> = {
     'errors.decryptionFailed': 'Giải mã thất bại. Kiểm tra lại mật khẩu.',
     'errors.noFile': 'Vui lòng chọn file để mã hóa',
     'about.title': 'Giới Thiệu',
-    'about.description': 'Công cụ mã hóa AES256GCM cung cấp giải pháp bảo mật dữ liệu đơn giản và hiệu quả. Tất cả dữ liệu được xử lý cục bộ trong trình duyệt, đảm bảo quyền riêng tư tuyệt đối.',
+    'about.description':
+      'Công cụ mã hóa AES256GCM cung cấp giải pháp bảo mật dữ liệu đơn giản và hiệu quả. Tất cả dữ liệu được xử lý cục bộ trong trình duyệt, đảm bảo quyền riêng tư tuyệt đối.',
     'about.features.title': 'Tính Năng',
     'about.features.item1': 'Mã hóa AES-256-GCM cấp quân sự',
     'about.features.item2': 'Xử lý dữ liệu cục bộ - không gửi lên server',
@@ -88,7 +89,15 @@ const translations: Record<string, Record<string, string>> = {
     'textdecrypt.result.label': 'Nội dung đã giải mã',
     'textdecrypt.result.placeholder': 'Nội dung giải mã sẽ hiển thị ở đây...',
     'textdecrypt.copy': 'Sao chép nội dung',
+
+    // ✅ Added for EncryptSection + validatePassword i18n
+    'password.match': 'Mật khẩu khớp',
+    'textencrypt.characters': 'ký tự',
+    'password.strength.strong': 'Mật khẩu mạnh',
+    'password.strength.medium': 'Mật khẩu trung bình',
+    'password.strength.weak': 'Mật khẩu yếu - hãy thêm loại ký tự khác',
   },
+
   en: {
     'app.title': 'AES256GCM Encryption Tool',
     'app.subtitle': 'Protect your data with military-grade encryption',
@@ -104,7 +113,8 @@ const translations: Record<string, Record<string, string>> = {
     'encrypt.dropzone.maxSize': 'Maximum size: 100MB',
     'encrypt.password.label': 'Encryption Password',
     'encrypt.password.placeholder': 'Enter a strong password...',
-    'encrypt.password.hint': 'Use at least 12 characters with uppercase, lowercase, numbers and special characters',
+    'encrypt.password.hint':
+      'Use at least 12 characters with uppercase, lowercase, numbers and special characters',
     'encrypt.confirmPassword.label': 'Confirm Password',
     'encrypt.confirmPassword.placeholder': 'Re-enter password...',
     'encrypt.button': 'Encrypt File',
@@ -128,7 +138,8 @@ const translations: Record<string, Record<string, string>> = {
     'result.copy': 'Copy',
     'result.download': 'Download',
     'result.copied': 'Copied!',
-    'result.warning': 'Warning: This token is displayed only once. Please copy and store it safely!',
+    'result.warning':
+      'Warning: This token is displayed only once. Please copy and store it safely!',
     'language.title': 'Language',
     'language.vi': 'Tiếng Việt',
     'language.en': 'English',
@@ -149,7 +160,8 @@ const translations: Record<string, Record<string, string>> = {
     'errors.decryptionFailed': 'Decryption failed. Please check your password.',
     'errors.noFile': 'Please select a file to encrypt',
     'about.title': 'About',
-    'about.description': 'The AES256GCM Encryption Tool provides a simple and effective data security solution. All data is processed locally in the browser, ensuring absolute privacy.',
+    'about.description':
+      'The AES256GCM Encryption Tool provides a simple and effective data security solution. All data is processed locally in the browser, ensuring absolute privacy.',
     'about.features.title': 'Features',
     'about.features.item1': 'Military-grade AES-256-GCM encryption',
     'about.features.item2': 'Local data processing - no server upload',
@@ -175,7 +187,15 @@ const translations: Record<string, Record<string, string>> = {
     'textdecrypt.result.label': 'Decrypted content',
     'textdecrypt.result.placeholder': 'Decrypted content will appear here...',
     'textdecrypt.copy': 'Copy content',
+
+    // ✅ Added for EncryptSection + validatePassword i18n
+    'password.match': 'Passwords match',
+    'textencrypt.characters': 'characters',
+    'password.strength.strong': 'Strong password',
+    'password.strength.medium': 'Medium strength password',
+    'password.strength.weak': 'Weak password - consider using more character types',
   },
+
   zh: {
     'app.title': 'AES256GCM加密工具',
     'app.subtitle': '使用军用级加密保护您的数据',
@@ -236,7 +256,8 @@ const translations: Record<string, Record<string, string>> = {
     'errors.decryptionFailed': '解密失败。请检查您的密码。',
     'errors.noFile': '请选择要加密的文件',
     'about.title': '关于',
-    'about.description': 'AES256GCM加密工具提供简单有效的数据安全解决方案。所有数据都在浏览器中本地处理，确保绝对隐私。',
+    'about.description':
+      'AES256GCM加密工具提供简单有效的数据安全解决方案。所有数据都在浏览器中本地处理，确保绝对隐私。',
     'about.features.title': '功能',
     'about.features.item1': '军用级AES-256-GCM加密',
     'about.features.item2': '本地数据处理 - 不上传到服务器',
@@ -262,7 +283,15 @@ const translations: Record<string, Record<string, string>> = {
     'textdecrypt.result.label': '解密后的内容',
     'textdecrypt.result.placeholder': '解密后的内容将显示在这里...',
     'textdecrypt.copy': '复制内容',
+
+    // ✅ Added
+    'password.match': '密码一致',
+    'textencrypt.characters': '字符',
+    'password.strength.strong': '强密码',
+    'password.strength.medium': '中等强度密码',
+    'password.strength.weak': '弱密码 - 建议增加更多字符类型',
   },
+
   ja: {
     'app.title': 'AES256GCM暗号化ツール',
     'app.subtitle': '軍事レベルの暗号化でデータを保護',
@@ -323,7 +352,8 @@ const translations: Record<string, Record<string, string>> = {
     'errors.decryptionFailed': '復号化に失敗しました。パスワードを確認してください。',
     'errors.noFile': '暗号化するファイルを選択してください',
     'about.title': '概要',
-    'about.description': 'AES256GCM暗号化ツールは、シンプルで効果的なデータセキュリティソリューションを提供します。すべてのデータはブラウザでローカルに処理され、絶対的なプライバシーを確保します。',
+    'about.description':
+      'AES256GCM暗号化ツールは、シンプルで効果的なデータセキュリティソリューションを提供します。すべてのデータはブラウザでローカルに処理され、絶対的なプライバシーを確保します。',
     'about.features.title': '機能',
     'about.features.item1': '軍事レベルのAES-256-GCM暗号化',
     'about.features.item2': 'ローカルデータ処理 - サーバーへのアップロードなし',
@@ -349,7 +379,15 @@ const translations: Record<string, Record<string, string>> = {
     'textdecrypt.result.label': '復号化された内容',
     'textdecrypt.result.placeholder': '復号化された内容がここに表示されます...',
     'textdecrypt.copy': '内容をコピー',
+
+    // ✅ Added
+    'password.match': 'パスワードが一致しました',
+    'textencrypt.characters': '文字',
+    'password.strength.strong': '強いパスワード',
+    'password.strength.medium': '中程度の強さのパスワード',
+    'password.strength.weak': '弱いパスワード - 文字種類を増やすことを推奨します',
   },
+
   ko: {
     'app.title': 'AES256GCM 암호화 도구',
     'app.subtitle': '군사급 암호화로 데이터 보호',
@@ -410,7 +448,8 @@ const translations: Record<string, Record<string, string>> = {
     'errors.decryptionFailed': '복호화에 실패했습니다. 비밀번호를 확인해 주세요.',
     'errors.noFile': '암호화할 파일을 선택해 주세요',
     'about.title': '소개',
-    'about.description': 'AES256GCM 암호화 도구는 간단하고 효과적인 데이터 보안 솔루션을 제공합니다. 모든 데이터는 브라우저에서 로컬로 처리되어 절대적인 개인정보 보호를 보장합니다.',
+    'about.description':
+      'AES256GCM 암호화 도구는 간단하고 효과적인 데이터 보안 솔루션을 제공합니다. 모든 데이터는 브라우저에서 로컬로 처리되어 절대적인 개인정보 보호를 보장합니다.',
     'about.features.title': '기능',
     'about.features.item1': '군사급 AES-256-GCM 암호화',
     'about.features.item2': '로컬 데이터 처리 - 서버 업로드 없음',
@@ -436,15 +475,29 @@ const translations: Record<string, Record<string, string>> = {
     'textdecrypt.result.label': '복호화된 내용',
     'textdecrypt.result.placeholder': '복호화된 내용이 여기에 표시됩니다...',
     'textdecrypt.copy': '내용 복사',
+
+    // ✅ Added
+    'password.match': '비밀번호가 일치합니다',
+    'textencrypt.characters': '자',
+    'password.strength.strong': '강력한 비밀번호',
+    'password.strength.medium': '중간 강도의 비밀번호',
+    'password.strength.weak': '약한 비밀번호 - 더 다양한 문자 조합을 권장합니다',
   },
 };
 
 export function useTranslation() {
-  const [language, setLanguage] = useState('vi');
+  const [language, setLanguage] = useState<'vi' | 'en' | 'zh' | 'ja' | 'ko'>('vi');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('app-language');
+    if (saved && saved in translations) {
+      setLanguage(saved as keyof typeof translations);
+    }
+  }, []);
 
   const t = useCallback(
     (key: string): string => {
-      return translations[language]?.[key] || translations['vi'][key] || key;
+      return translations[language]?.[key] ?? translations.vi[key] ?? key;
     },
     [language]
   );
@@ -452,18 +505,11 @@ export function useTranslation() {
   const i18n = {
     language,
     changeLanguage: (lng: string) => {
-      setLanguage(lng);
+      if (!(lng in translations)) return;
+      setLanguage(lng as keyof typeof translations);
       localStorage.setItem('app-language', lng);
     },
   };
-
-  // Load saved language on mount
-  useState(() => {
-    const saved = localStorage.getItem('app-language');
-    if (saved && translations[saved]) {
-      setLanguage(saved);
-    }
-  });
 
   return { t, i18n };
 }
