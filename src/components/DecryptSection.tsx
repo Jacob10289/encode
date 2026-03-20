@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import { Unlock, Eye, EyeOff, Loader2, FileText, Upload, Download } from 'lucide-react';
-import { decryptFileFromBlob, decryptText, isValidTextToken } from '../utils/crypto';
+import { decryptFileFromBlob, decryptText } from '../utils/crypto';
 
 type DecryptMode = 'file' | 'text';
 
