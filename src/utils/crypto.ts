@@ -1,16 +1,22 @@
 /**
  * AES-256-GCM Encryption/Decryption Utility
+ * Format: [salt(16)][iv(12)][filenameLen(1)][mimeLen(1)][filename][mime][ciphertext][tag(16)]
  */
 
-// ===== INTERFACES (Giữ lại để tương thích) =====
+export interface EncryptedFileData {
+  salt: string;
+  iv: string;
+  tag: string;
+  filename: string;
+  mimeType: string;
+}
 
-export interface EncryptedData {
+export interface EncryptedTextData {
   ciphertext: string;
   iv: string;
   salt: string;
   tag: string;
-  filename: string;
-  mimeType: string;
+  isText: boolean;
 }
 
 export interface EncryptionResult {
@@ -24,16 +30,6 @@ export interface TextEncryptionResult {
   textLength: number;
 }
 
-export interface TextEncryptedData {
-  ciphertext: string;
-  iv: string;
-  salt: string;
-  tag: string;
-  isText: boolean;
-}
-
-// ===== CONSTANTS =====
-
 const ALGORITHM = 'AES-GCM';
 const KEY_LENGTH = 256;
 const IV_LENGTH = 12;
@@ -41,8 +37,6 @@ const SALT_LENGTH = 16;
 const TAG_LENGTH = 128;
 const ITERATIONS = 100000;
 const BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-
-// ===== BASE58 ENCODE/DECODE =====
 
 function base58Encode(buffer: Uint8Array): string {
   const alphabet = BASE58_ALPHABET;
@@ -92,8 +86,6 @@ function base58Decode(str: string): Uint8Array {
   return new Uint8Array(bytes);
 }
 
-// ===== KEY DERIVATION =====
-
 async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey> {
   const encoder = new TextEncoder();
   const passwordData = encoder.encode(password);
@@ -120,15 +112,16 @@ async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey>
   );
 }
 
-// ===== FILE ENCRYPTION (.enc format) =====
-
+/**
+ * Mã hóa FILE → .enc
+ * Format: [salt(16)][iv(12)][filenameLen(1)][mimeLen(1)][filename][mime][ciphertext][tag(16)]
+ */
 export async function encryptFileToBlob(
   file: File,
   password: string
 ): Promise<{ blob: Blob; token: string; filename: string }> {
   const salt = crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
   const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));
-
   const key = await deriveKey(password, salt);
   const fileData = await file.arrayBuffer();
 
@@ -139,8 +132,8 @@ export async function encryptFileToBlob(
   );
 
   const encryptedBytes = new Uint8Array(encryptedData);
-  const ciphertext = encryptedBytes.slice(0, -16);
-  const tag = encryptedBytes.slice(-16);
+  const ciphertext = encryptedBytes.slice(0, -16); // Cắt 16 bytes cuối (tag)
+  const tag = encryptedBytes.slice(-16);           // 16 bytes tag
 
   const filenameBytes = new TextEncoder().encode(file.name);
   const mimeBytes = new TextEncoder().encode(file.type || 'application/octet-stream');
@@ -149,6 +142,7 @@ export async function encryptFileToBlob(
     throw new Error('Filename or MIME type too long');
   }
 
+  // Header: salt(16) + iv(12) + filenameLen(1) + mimeLen(1) + filename + mime
   const headerLen = 16 + 12 + 1 + 1 + filenameBytes.length + mimeBytes.length;
   const header = new Uint8Array(headerLen);
   let offset = 0;
@@ -160,12 +154,14 @@ export async function encryptFileToBlob(
   header.set(filenameBytes, offset); offset += filenameBytes.length;
   header.set(mimeBytes, offset);
 
-  const finalData = new Uint8Array(header.length + ciphertext.length + tag.length);
+  // Gộp: header + ciphertext + tag (tag ở cuối!)
+  const finalData = new Uint8Array(headerLen + ciphertext.length + tag.length);
   finalData.set(header, 0);
-  finalData.set(ciphertext, header.length);
-  finalData.set(tag, header.length + ciphertext.length);
+  finalData.set(ciphertext, headerLen);
+  finalData.set(tag, headerLen + ciphertext.length);
 
-  const metadata = { s: 'verify', f: file.name.substring(0, 15), z: file.size };
+  // Token ngắn để verify (chỉ chứa metadata, không chứa dữ liệu mã hóa)
+  const metadata = { f: file.name.substring(0, 15), z: file.size };
   const token = base58Encode(new TextEncoder().encode(JSON.stringify(metadata)));
 
   return {
@@ -175,12 +171,16 @@ export async function encryptFileToBlob(
   };
 }
 
+/**
+ * Giải mã từ file .enc
+ */
 export async function decryptFileFromBlob(
   blob: Blob,
   password: string
 ): Promise<{ blob: Blob; filename: string }> {
   const data = new Uint8Array(await blob.arrayBuffer());
   
+  // Đọc header
   const salt = data.slice(0, 16);
   const iv = data.slice(16, 28);
   const filenameLen = data[28];
@@ -189,14 +189,17 @@ export async function decryptFileFromBlob(
   
   const filenameBytes = data.slice(30, 30 + filenameLen);
   const mimeBytes = data.slice(30 + filenameLen, headerEnd);
+  
+  // Ciphertext: từ sau header đến trước 16 bytes cuối (tag)
   const ciphertext = data.slice(headerEnd, -16);
-  const tag = data.slice(-16);
+  const tag = data.slice(-16); // 16 bytes cuối là tag
   
   const filename = new TextDecoder().decode(filenameBytes) || 'decrypted_file';
   const mimeType = new TextDecoder().decode(mimeBytes) || 'application/octet-stream';
 
   const key = await deriveKey(password, salt);
 
+  // Ghép ciphertext + tag để giải mã
   const encryptedBytes = new Uint8Array(ciphertext.length + tag.length);
   encryptedBytes.set(ciphertext, 0);
   encryptedBytes.set(tag, ciphertext.length);
@@ -213,15 +216,15 @@ export async function decryptFileFromBlob(
   };
 }
 
-// ===== TEXT ENCRYPTION (Token Base58) =====
-
+/**
+ * Mã hóa TEXT → Token Base58
+ */
 export async function encryptText(
   text: string,
   password: string
 ): Promise<TextEncryptionResult> {
   const salt = crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
   const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));
-
   const key = await deriveKey(password, salt);
   const textData = new TextEncoder().encode(text);
 
@@ -246,6 +249,9 @@ export async function encryptText(
   return { token, textLength: text.length };
 }
 
+/**
+ * Giải mã TEXT từ token
+ */
 export async function decryptText(token: string, password: string): Promise<string> {
   const data = base58Decode(token);
   if (data.length < 44) throw new Error('Invalid token');
@@ -269,23 +275,6 @@ export async function decryptText(token: string, password: string): Promise<stri
 
   return new TextDecoder().decode(decryptedData);
 }
-
-// ===== LEGACY FUNCTIONS (Cho backward compatibility) =====
-
-export async function encryptFile(file: File, password: string): Promise<EncryptionResult> {
-  const result = await encryptFileToBlob(file, password);
-  return { token: result.token, filename: file.name, size: file.size };
-}
-
-export async function decryptData(token: string, password: string): Promise<{ blob: Blob; filename: string }> {
-  throw new Error('Legacy decryptData removed. Use decryptFileFromBlob or decryptText.');
-}
-
-export function isTextToken(token: string): boolean {
-  return isValidTextToken(token);
-}
-
-// ===== UTILITIES =====
 
 export function isValidTextToken(token: string): boolean {
   return /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/.test(token);
@@ -321,6 +310,23 @@ export function formatFileSize(bytes: number): string {
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Legacy exports
+export async function encryptFile(file: File, password: string): Promise<EncryptionResult> {
+  const result = await encryptFileToBlob(file, password);
+  return { token: result.token, filename: result.filename, size: file.size };
+}
+
+export async function decryptData(
+  _token: string,
+  _password: string
+): Promise<{ blob: Blob; filename: string }> {
+  throw new Error('Legacy decryptData removed. Use decryptFileFromBlob or decryptText.');
+}
+
+export function isTextToken(token: string): boolean {
+  return isValidTextToken(token);
 }
 
 export function generateSecurePassword(length: number = 16): string {
