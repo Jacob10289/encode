@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import { Lock, Eye, EyeOff, Key, Loader2, FileText, Upload, Download } from 'lucide-react';
 import FileUpload from './FileUpload';
-import TokenDisplay from './TokenDisplay';
 import { encryptFileToBlob, encryptText, validatePassword } from '../utils/crypto';
 
 type EncryptMode = 'file' | 'text';
