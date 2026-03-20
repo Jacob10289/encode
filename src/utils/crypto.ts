@@ -98,10 +98,11 @@ async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey>
     ['deriveBits', 'deriveKey']
   );
 
+  // Sửa lỗi type: salt phải là ArrayBuffer, không phải Uint8Array
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: salt,
+      salt: salt.buffer.slice(salt.byteOffset, salt.byteOffset + salt.byteLength),
       iterations: ITERATIONS,
       hash: 'SHA-256',
     },
@@ -111,6 +112,7 @@ async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey>
     ['encrypt', 'decrypt']
   );
 }
+
 
 /**
  * Mã hóa FILE → .enc
