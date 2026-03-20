@@ -439,6 +439,57 @@ export function validatePassword(password: string): {
     };
   }
 }
+/**
+ * Format file size for display (Giữ lại để FileUpload.tsx sử dụng)
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+/**
+ * Legacy interface để tương thích với TokenDisplay.tsx cũ
+ * Nếu không dùng TokenDisplay nữa thì có thể xóa
+ */
+export interface EncryptionResult {
+  token: string;
+  filename: string;
+  size: number;
+}
+
+/**
+ * Legacy export để tương thích với code cũ
+ */
+export async function encryptFile(
+  file: File,
+  password: string
+): Promise<EncryptionResult> {
+  const result = await encryptFileToBlob(file, password);
+  return {
+    token: result.token,
+    filename: result.filename,
+    size: file.size
+  };
+}
+
+/**
+ * Legacy decrypt để tương thích
+ */
+export async function decryptData(
+  token: string,
+  password: string
+): Promise<{ blob: Blob; filename: string }> {
+  // Nếu là token text (Base58) thì decrypt text rồi convert sang blob
+  if (isValidTextToken(token)) {
+    const text = await decryptText(token, password);
+    const blob = new Blob([text], { type: 'text/plain' });
+    return { blob, filename: 'decrypted_text.txt' };
+  }
+  throw new Error('Use decryptFileFromBlob for file decryption');
+}
 
 export function generateSecurePassword(length: number = 16): string {
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
