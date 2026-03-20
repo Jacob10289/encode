@@ -105,17 +105,6 @@ function obfuscate(data: string, key: string = 'AES256GCM'): string {
   return base58Encode(bytes);
 }
 
-function deobfuscate(data: string, key: string = 'AES256GCM'): string {
-  const bytes = base58Decode(data);
-  const str = new TextDecoder().decode(bytes);
-  const result: string[] = [];
-  for (let i = 0; i < str.length; i++) {
-    const charCode = str.charCodeAt(i) ^ key.charCodeAt(i % key.length);
-    result.push(String.fromCharCode(charCode));
-  }
-  return result.join('');
-}
-
 /**
  * Derive key từ password dùng PBKDF2
  */
